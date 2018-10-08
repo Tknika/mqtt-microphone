@@ -53,4 +53,5 @@ if __name__ == "__main__":
         detector.start(detected_callback=speech_recognition, sleep_time=0.03)
         detector.terminate()
     except Exception as e:
+        audio_handler.play_audio_file(os.path.join(current_dir, "audio_files/error.wav"))
         logger.exception("Unhandled exception: {0}".format(e))
