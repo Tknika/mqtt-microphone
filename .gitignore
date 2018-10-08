@@ -4,9 +4,5 @@ env
 *.pmdl
 *.umdl
 *.json
-snowboy/Linux (x64)/_snowboydetect.so
-snowboy/Linux (x64)/snowboydetect.py
-snowboy/Raspberry Pi/_snowboydetect.so
-snowboy/Raspberry Pi/snowboydetect.py
 snowboy/_snowboydetect.so
 snowboy/snowboydetect.py
