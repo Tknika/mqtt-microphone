@@ -1,0 +1,3 @@
+paho-mqtt
+google-cloud-speech
+pyaudio
