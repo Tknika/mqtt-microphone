@@ -15,7 +15,7 @@ MQTT_HOST = "localhost"
 MQTT_USER = "test"
 MQTT_PASSWORD = "test"
 
-logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
