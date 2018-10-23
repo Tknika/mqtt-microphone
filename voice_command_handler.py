@@ -4,39 +4,27 @@
 import logging
 import json
 import time
-import paho.mqtt.client as mqtt
+import threading
 import paho.mqtt.publish as publish
 
 logger = logging.getLogger(__name__)
 
 class VoiceCommandHandler(object):
-    def __init__(self, device_name="", hostname="localhost", port=1883, username="test", password="test", keepalive=60):
+    def __init__(self, device_name="", mqtt_handler=None):
         self.device_name = device_name
         self.device_location = self.device_name.split("_")[1]
-        self.hostname = hostname
-        self.port = port
-        self.username = username
-        self.password = password
-        self.keepalive = keepalive
-        self.client = mqtt.Client()
-        self.client.username_pw_set(self.username, self.password)
-        self.client.on_connect = self.on_connect
-        self.client.on_message = self.on_message
-        self.client.connect(self.hostname, self.port, self.keepalive)
-        self.client.loop_start()
+        self.mqtt_handler = mqtt_handler
+        self.answer_topic = "{}/+".format(self.device_name)
+        self.mqtt_handler.subscribe(self.answer_topic, self.__on_answer)
 
-    def on_message(self, client, userdata, msg):
+    def __on_answer(self, client, userdata, msg):
         if "notification" in msg.topic:
             self.process_notification(str(msg.payload))
         elif "question" in msg.topic:
             self.process_question(str(msg.payload))
 
-    def on_connect(self, client, userdata, flags, rc):
-        self.client.subscribe([("{}/notification".format(self.device_name), 2), 
-                                ("{}/question".format(self.device_name), 2)])
-
     def process_voice_command(self, topic="voice/command", command=""):
-        self.client.publish(topic, command)
+        self.mqtt_handler.publish(topic, command)
 
     def process_notification(self, notification_json):
         text = json.loads(notification_json)["text"]
@@ -47,12 +35,7 @@ class VoiceCommandHandler(object):
         self.squeeze_speak(text)
         time.sleep(5)
 
-    def complete_silence(self, state):
-        topic = "reproductores/silencio"
-        if state != "ON" and state != "OFF": return
-        publish.single(topic, state, hostname=self.hostname, auth={'username': self.username, 'password': self.password})
-
     def squeeze_speak(self, text):
         payload = json.dumps({"location": self.device_location, "text": text}, ensure_ascii=False, encoding="utf-8")
         topic = "squeeze/speak"
-        publish.single(topic, payload, hostname=self.hostname, auth={'username': self.username, 'password':self.password})
+        threading.Thread(target=self.mqtt_handler.publish, args=[topic, payload]).start()

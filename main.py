@@ -4,6 +4,7 @@
 import logging
 import os
 import audio_handler
+import mqtt_handler
 import google_stt_handler as stt_handler
 from snowboy import snowboydecoder
 from voice_command_handler import VoiceCommandHandler
@@ -40,12 +41,16 @@ if __name__ == "__main__":
 
         models_path = [os.path.join(current_dir, "voice_models/{}".format(model_name)) for model_name in MODEL_NAMES]
 
-        vch = VoiceCommandHandler(device_name=DEVICE_NAME, hostname=MQTT_HOST, username=MQTT_USER, password=MQTT_PASSWORD)
+        mqtt_handler.initialize(host=MQTT_HOST, username=MQTT_USER, password=MQTT_PASSWORD)
+
+        vch = VoiceCommandHandler(device_name=DEVICE_NAME, mqtt_handler=mqtt_handler)
 
         detector = snowboydecoder.HotwordDetector(models_path, sensitivity=0.4)
         stt_handler.initialize()
 
         audio_handler.play_audio_file(os.path.join(current_dir, "audio_files/on.wav"))
+
+        mqtt_handler.start()
 
         callbacks = [lambda: speech_recognition(),
                      lambda: speech_recognition()]        
