@@ -4,6 +4,7 @@
 import logging
 import os
 import audio_handler
+import speaker_handler
 import mqtt_handler
 import google_stt_handler as stt_handler
 from snowboy import snowboydecoder
@@ -43,7 +44,7 @@ if __name__ == "__main__":
 
         mqtt_handler.initialize(host=MQTT_HOST, username=MQTT_USER, password=MQTT_PASSWORD)
 
-        vch = VoiceCommandHandler(device_name=DEVICE_NAME, mqtt_handler=mqtt_handler)
+        vch = VoiceCommandHandler(device_name=DEVICE_NAME)
 
         detector = snowboydecoder.HotwordDetector(models_path, sensitivity=0.4)
         stt_handler.initialize()
