@@ -34,7 +34,7 @@ def subscribe(topic, callback):
     CLIENT.message_callback_add(topic, callback)
 
 
-def unsuscribe(topic):
+def unsubscribe(topic):
     CLIENT.unsubscribe(topic)
 
 
