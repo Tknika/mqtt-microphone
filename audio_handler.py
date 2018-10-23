@@ -2,11 +2,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import os
 import wave
 import pyaudio
 import time
 import threading
 import logging
+import numpy
+import struct
+
 from ctypes import CFUNCTYPE, c_char_p, c_int,cdll
 from contextlib import contextmanager
 
@@ -63,3 +67,31 @@ def play_async_audio_file(fname=None):
         return
 
     threading.Thread(target=play_audio_file, args=[fname]).start()
+
+def play_audio(data, volume=100):
+    start_time = time.time()
+
+    tmp_file = "tmp.wav"
+    with open(tmp_file, 'wb') as f:
+        f.write(data)
+    wave_data = wave.open(tmp_file, 'rb')
+    os.remove(tmp_file)
+    logger.debug("Time to get the wave file: {} seconds".format(time.time() - start_time))
+
+    data = wave_data.readframes(wave_data.getnframes())
+
+    # t_volume = time.time()
+    # data = numpy.fromstring(data, numpy.int16) / 100 * volume  # half amplitude
+    # data = struct.pack('h' * len(data), *data)
+    # logger.debug("Time to change the volume: {} seconds".format(time.time() - t_volume))
+
+    p = pyaudio.PyAudio()
+    stream = p.open(format=p.get_format_from_width(wave_data.getsampwidth()),
+                    channels=wave_data.getnchannels(), rate=wave_data.getframerate(), output=True)
+    stream.start_stream()
+    stream.write(data)
+    time.sleep(0.1)
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
+    logger.debug("Time to play the file: {} seconds".format(time.time() - start_time))
