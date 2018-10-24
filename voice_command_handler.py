@@ -6,7 +6,7 @@ import json
 import time
 import threading
 import mqtt_handler
-import speaker_handler
+import tts_handler
 
 logger = logging.getLogger(__name__)
 
@@ -26,18 +26,19 @@ class VoiceCommandHandler(object):
             self.__on_notify(msg.payload.decode("UTF-8"))
 
     def __on_notify(self, text):
-        speaker_handler.speak(text)
+        logger.debug("'{}' message received, say it loud".format(text))
+        tts_handler.speak(text)
 
     def process_voice_command(self, topic="voice/command", command=""):
         mqtt_handler.publish(topic, command)
 
     def process_notification(self, notification_json):
         text = json.loads(notification_json)["text"]
-        speaker_handler.speak(text)
+        tts_handler.speak(text)
 
     def process_question(self, question_json):
         text = json.loads(question_json)["text"]
-        speaker_handler.speak(text)
+        tts_handler.speak(text)
         time.sleep(5)
 
     # def squeeze_speak(self, text):

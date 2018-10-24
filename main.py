@@ -4,7 +4,7 @@
 import logging
 import os
 import audio_handler
-import speaker_handler
+import tts_handler
 import mqtt_handler
 import google_stt_handler as stt_handler
 from snowboy import snowboydecoder

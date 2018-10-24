@@ -28,16 +28,16 @@ def __speak(info):
         logger.error("Error decoding __speak information: {}".format(e))
         return
     logger.debug("Let's say: '{}' with volume: {}".format(text, VOLUME))
-    get_audio(text)
+    __get_audio(text)
 
-def get_audio(text=""):
+def __get_audio(text=""):
     tmp_topic = "{}/{}".format(GET_AUDIO_TOPIC, str(uuid.uuid4()))
     payload = json.dumps({"topic": tmp_topic,
                           "audio_info": {"text": text, "language": LANGUAGE, "gender": GENDER}})
-    mqtt_handler.subscribe(tmp_topic, get_audio_response)
+    mqtt_handler.subscribe(tmp_topic, __get_audio_response)
     mqtt_handler.publish(GET_AUDIO_TOPIC, payload, 1)
 
-def get_audio_response(_, __, msg):
+def __get_audio_response(_, __, msg):
     payload = json.loads(msg.payload.decode("UTF-8"))
 
     status = payload["status"]
