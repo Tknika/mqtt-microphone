@@ -1,0 +1,14 @@
+[Unit]
+Description=MQTT Microphone (Google STT)
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+WorkingDirectory=/opt/mqtt-microphone
+ExecStart=/opt/mqtt-microphone/env/bin/python3 /opt/mqtt-microphone/main.py
+
+[Install]
+WantedBy=multi-user.target
